@@ -11,6 +11,13 @@ set (FIGHTING_SRCS
 
 add_executable(fighting_tutorial ${FIGHTING_SRCS})
 
-find_library(SDL_LIB SDL2)
+# glew
+find_library(GL_LIB GL)
+find_library(GLEW_LIB GLEW)
+message(${GL_LIB})
+message(${GLEW_LIB})
+
+# SDL2
+find_library(SDL_LIB SDL2 REQUIRED)
 message(${SDL_LIB})
-target_link_libraries(fighting_tutorial SDL2)
+target_link_libraries(fighting_tutorial SDL2 GL GLEW)
