@@ -6,6 +6,7 @@ import os.path
 import shutil
 import zipfile
 import argparse
+import tarfile
 
 
 # Declare script arguments
@@ -14,18 +15,33 @@ parser.add_argument("--platform", help="Override platform name to install depend
 args = parser.parse_args()
 
 
+# Variants for different archive types extraction
+def extract_zip(file_path, extract_path):
+    with zipfile.ZipFile(file_path, 'r') as zip_ref:
+        zip_ref.extractall(extract_path)
+        print('Unzipped into %s' % extract_path)
+
+
+def extract_targz(file_path, extract_path):
+    with tarfile.open(file_path, "r:gz") as targz_file:
+        targz_file.extractall(path=extract_path)
+        print('Extracted into %s' % extract_path)
+
+
 platform_configs = {
     'windows': {
         'sharedLibExtension': '.dll',
         'archivePath': os.path.join('external', 'windows.zip'),
         'lib_types': ['.lib'],
         'binary_types': ['.dll'],
+        'extractor': extract_zip,
     },
     'linux': {
         'sharedLibExtension': '.so',
         'archivePath': os.path.join('external', 'linux.tar.gz'),
         'lib_types': ['.a', '.so'],
         'binary_types': ['.so'],
+        'extractor': extract_targz,
     },
     'darwin': {
         'sharedLibExtension': '.so',
@@ -72,15 +88,13 @@ print('Unzipping archive...')
 if os.path.isfile(platform_config['archivePath']):
     extract_dir = os.path.join('external', 'extracted_temp')
 
-    with zipfile.ZipFile(platform_config['archivePath'], 'r') as zip_ref:
-        zip_ref.extractall(extract_dir)
-        print('Unzipped into %s' % extract_dir)
+    platform_config['extractor'](platform_config['archivePath'], extract_dir)
 
     # Move include folder as is
     print('Copying includes...')
     remove_dir_tree(os.path.join('libs', 'include'))
     shutil.move(os.path.join(extract_dir, 'include'), 'libs')
-    print('OK')
+    print('Done.')
 
     # Copy link libraries to lib folder
     print('Copying library files and binaries...')
@@ -96,9 +110,10 @@ if os.path.isfile(platform_config['archivePath']):
                 shutil.copyfile(os.path.join(extract_dir, 'lib', f), os.path.join('bin', f))
                 print('Copied "%s" to "%s"' % (os.path.join(extract_dir, 'lib', f), os.path.join('bin', f)))
                 break
+    print('Done.')
 
     # Remove temp folder with extracted content
-    print('Removing temp dir %s' % extract_dir)
+    print('Removing temp dir %s...' % extract_dir)
     remove_dir_tree(extract_dir)
 else:
-    print("Zipped archive file for given platform not found!")
+    print("Archive file for given platform not found!")

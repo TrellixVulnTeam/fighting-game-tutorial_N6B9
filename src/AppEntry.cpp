@@ -77,7 +77,7 @@ bool load_shader_program(const std::string& programPath, GLuint* outProgramId)
     GLuint vertexShader;
     GLuint fragmentShader;
 
-    std::filesystem::path shadersPath = std::filesystem::current_path() / ".." / "assets" / "shaders";
+    std::filesystem::path shadersPath = std::filesystem::path(ASSETS_PATH) / "shaders";
     bool vertexShaderOk = load_shader_from_file((shadersPath / (programPath + ".vs")).string(), &vertexShader, GL_VERTEX_SHADER);
     bool fragmentShaderOk = load_shader_from_file((shadersPath / (programPath + ".fs")).string(), &fragmentShader, GL_FRAGMENT_SHADER);
 
