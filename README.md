@@ -2,6 +2,12 @@
 
 Fighting game created in educational purposes.
 
+## Installation
+
+1. Run ```python install_dependencies.py``` to extract libraries for current platform and generate correct directory structure
+2. Use CMake to generate project
+
+
 ## Goals
 
 Learn programming techniques and development patterns using C++ language

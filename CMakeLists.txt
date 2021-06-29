@@ -11,13 +11,21 @@ set (FIGHTING_SRCS
 
 add_executable(fighting_tutorial ${FIGHTING_SRCS})
 
-# glew
-find_library(GL_LIB GL)
-find_library(GLEW_LIB GLEW)
-message(${GL_LIB})
-message(${GLEW_LIB})
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/libs")
 
-# SDL2
-find_library(SDL_LIB SDL2 REQUIRED)
-message(${SDL_LIB})
-target_link_libraries(fighting_tutorial SDL2 GL GLEW)
+find_package(OpenGL)
+message("OpenGL support libs: ${OPENGL_LIBRARIES}")
+
+if(WIN32)
+    find_library(SDL2_LIB SDL2 REQUIRED)
+    find_library(GLEW_LIB glew32 REQUIRED)
+
+    message(${SDL2_LIB})
+    message(${GLEW_LIB})
+
+    target_link_libraries(fighting_tutorial SDL2 glew32)
+endif()
+
+target_include_directories(fighting_tutorial PUBLIC libs/include)
+target_link_directories(fighting_tutorial PUBLIC libs/lib)
+target_link_libraries(fighting_tutorial ${OPENGL_LIBRARIES})
